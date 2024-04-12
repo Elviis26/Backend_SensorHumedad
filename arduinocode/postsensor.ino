@@ -1,9 +1,14 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "DHT.h"
+#define DHTPIN 2
+#define DHTTYPE DHT11
 
-const char* ssid = "";
-const char* password =  "";
-const char* serverName = "";
+DHT dht(DHTPIN, DHTTYPE);
+
+const char* ssid = "HITRON-6FC0";  //NOMBRE RED WIFI
+const char* password =  "Dirtysouth4824joeys"; // CONTRASEÑA RED WIFI
+const char* serverName = "http://192.168.0.16:3000/datos"; //IP, PUERTO , TABLA
 
 int cont = 300;
 String ip;
@@ -41,8 +46,15 @@ void setup() {
 
 void loop() {
   //Send an HTTP POST request every 10 minutes
-
+  delay(2000); //Es un sensor lento, por lo que hay que darle tiempo.
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
   
+  if (isnan(h) || isnan(t)) {
+  Serial.println(F("Failed to read from DHT sensor!"));
+  return;
+  }
+
   if ((millis() - lastTime) > timerDelay) {
      int sensor = analogReadMilliVolts(2);
     //Check WiFi connection status
@@ -71,9 +83,14 @@ void loop() {
       
       // If you need an HTTP request with a content type: application/json, use the following:
       http.addHeader("Content-Type", "application/json");
-      int httpResponseCode = http.POST("{\"value\":\"" + String(sensor) + "\",\"ip\":\"localhost\",\"device\":\"espdiego\"}");
-
-  
+      //int httpResponseCode = http.POST("{\"value\":\"" + String(sensor) + "\",\"ip\":\"localhost\",\"device\":\"espdiego\"}");
+      int httpResponseCode = http.POST("{\"nombrecompleto\":\"Elvis Morales\","
+                                  "\"correouniversidad\":\"emoralesc32@miumg.edu.gt\","
+                                  "\"carne\":\"0902-21-19503\","
+                                  "\"latitud\":\"1\","
+                                  "\"longitud\":\"2\","                                  
+                                  "\"humedad\":" + String(h) + ","
+                                  "\"temperatura\":" + String(t) + "}");
      
       Serial.print("HTTP Response code: ");
       Serial.println(httpResponseCode);

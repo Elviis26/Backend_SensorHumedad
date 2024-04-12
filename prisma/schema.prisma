@@ -13,16 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model usuarios {
+model datos {
 id Int @id @default(autoincrement())
-nombre String
-apellido String
-}
-
-model sensor {
-id Int @id @default(autoincrement())
-value Decimal
-device String
-ip String
-date DateTime @default(now())
+nombrecompleto String
+correouniversidad String
+carne String
+latitud String
+longitud String
+humedad Float
+temperatura Float
 }
